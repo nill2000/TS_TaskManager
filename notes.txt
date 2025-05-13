@@ -1,0 +1,13 @@
+Learn:
+1. TypeScript
+2. Prisma
+3. PostgresSQL
+4. Supabase
+
+run:
+npm install typescript
+npx tsc --init for tsconfig.json
+
+Project for Learning:
+Task Tracker App
+
