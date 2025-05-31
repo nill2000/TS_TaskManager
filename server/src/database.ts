@@ -14,12 +14,18 @@ const main = async () => {
 };
 
 export const getTasks = async () => {
+  const allTasks = await prisma.task.findMany();
   console.log("Getting Tasks  - Database");
-  return { Message: "Get Tasks" };
+  return { Tasks: allTasks };
 };
 
-export const addTask = async () => {
-  console.log("Adding Task - Database");
+export const addTask = async (task: string) => {
+  const createTask = await prisma.task.create({
+    data: {
+      text: task,
+    },
+  });
+  console.log("Task added to db - db");
   return { Message: "Adding a Task" };
 };
 

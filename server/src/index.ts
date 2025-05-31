@@ -1,40 +1,36 @@
 import express, { Request, Response } from "express";
 import { getTasks, addTask, deleteTask, updateTask } from "./database";
-import { PrismaClient } from "../prisma/generated";
 import cors from "cors";
 
 const app = express();
-const prisma = new PrismaClient();
-
 app.use(cors());
 app.use(express.json());
 
 const PORT = 4000;
 
-app.get("/getTasks", async (req, res) => {
-  //   const tasks = await prisma.task.findMany();
-  //   res.json(tasks);
-
+//Obtains all tasks to show into task manager
+app.get("/getTasks", async (req: Request, res: Response) => {
   const tasks = await getTasks();
+  console.log(tasks);
   res.json(tasks);
 });
 
-app.post("/addTask", async (req, res) => {
-  //   const { text } = req.body;
-  //   const task = await prisma.task.create({
-  //     data: { text },
-  //   });
-  //   res.json(task);
-  const addedTask = addTask();
+//Adds a task to the task manager
+app.post("/addTask", async (req: Request, res: Response) => {
+  const { text } = req.body;
+  console.log(text);
+  const addedTask = addTask(text); //Function saves task to database
   res.json(addedTask);
 });
 
-app.put("/updateTask", async (req, res) => {
+//Edits a task
+app.put("/updateTask", async (req: Request, res: Response) => {
   const updatedTask = updateTask();
   res.json(updatedTask);
 });
 
-app.delete("/deleteTask", async (req, res) => {
+//Deletes a task
+app.delete("/deleteTask", async (req: Request, res: Response) => {
   const deletedTask = await deleteTask();
   res.json(deletedTask);
 });

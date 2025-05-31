@@ -17,7 +17,8 @@ export default function TaskBody() {
     setNewTask(e.target.value);
   };
 
-  const addTask = () => {
+  //Add task to list and db
+  const addTask = async () => {
     // Check if empty; create an object of type Task
     if (newTask.trim() !== "") {
       const newTaskObj: Task = {
@@ -25,12 +26,35 @@ export default function TaskBody() {
         text: newTask,
       };
 
+      console.log(newTask);
+      console.log("Adding Task Request - Client");
+      const addTaskUrl = "http://localhost:4000/addTask";
+
+      try {
+        const response = await fetch(addTaskUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: newTask }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Response ${response.status}`);
+        }
+        const addedTask = await response.json();
+        console.log(addedTask);
+      } catch (error) {
+        console.error(error.message);
+      }
+
       // Takes the current items already in tasks and add the new task - newTaskObj
       setTasks([...tasks, newTaskObj]);
       setNewTask("");
     }
   };
 
+  //Function to delete Tasks
   const handleDelete = async (id: number): Promise<void> => {
     console.log("Making Delete Request - Client");
     const deleteTaskUrl = "http://localhost:4000/deleteTask";
@@ -57,6 +81,7 @@ export default function TaskBody() {
     setTasks(filteredArray);
   };
 
+  //Function to get tasks for useEffect
   const fetchTasks = async () => {
     console.log("Fetching Tasks Called - Client");
     const fetchTasksUrl = "http://localhost:4000/getTasks";
@@ -70,8 +95,11 @@ export default function TaskBody() {
         throw new Error(`Response ${response.status}`);
       }
 
-      const fetchedTasks = await response.json();
-      console.log(fetchedTasks);
+      const fetchedTasks = await response.json(); //Gives back an object with tasks as the key. That same "Task" contains an array of objects for each id and text. Try console.log() and see
+
+      setTasks(fetchedTasks.Tasks);
+
+      console.log(fetchedTasks.Tasks);
     } catch (error) {
       console.error(error.message);
     }
