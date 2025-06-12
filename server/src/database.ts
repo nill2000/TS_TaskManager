@@ -25,16 +25,33 @@ export const addTask = async (task: string) => {
       text: task,
     },
   });
+
+  console.log("From database.ts:");
+  console.log(createTask);
   console.log("Task added to db - db");
-  return { Message: "Adding a Task" };
+  return createTask;
 };
 
-export const deleteTask = async () => {
+export const deleteTask = async (id: number) => {
+  const removedTask = await prisma.task.delete({
+    where: {
+      id: id,
+    },
+  });
   console.log("Deleting Task - Database");
-  return { Message: "Deleting a Task" };
+  return removedTask;
 };
 
-export const updateTask = async () => {
+export const updateTask = async (id: number, text: string) => {
+  const updatedUser = await prisma.task.update({
+    where: {
+      id: id,
+    },
+    data: {
+      text: text,
+    },
+  });
+  console.log(updatedUser);
   console.log("Updating Task - Database");
   return { Message: "Updating a Task" };
 };

@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Message from "./Message.tsx";
+import Message2 from "./Message2.tsx";
 
 export default function TaskBody() {
+  //Matching schema of prisma orm
   type Task = {
     id: number;
     text: string;
+    is_done: boolean;
+    created_at: number;
   };
 
   //Controls the tasks to filter as an array and render
@@ -21,16 +25,16 @@ export default function TaskBody() {
   const addTask = async () => {
     // Check if empty; create an object of type Task
     if (newTask.trim() !== "") {
-      const newTaskObj: Task = {
-        id: Date.now(),
-        text: newTask,
-      };
+      //   const newTaskObj: Task = {
+      //     id: null,
+      //     text: newTask,
+      //   };
 
-      console.log(newTask);
+      console.log(`Task from Fill in: ${newTask}`);
       console.log("Adding Task Request - Client");
-      const addTaskUrl = "http://localhost:4000/addTask";
 
       try {
+        const addTaskUrl = "http://localhost:4000/addTask";
         const response = await fetch(addTaskUrl, {
           method: "POST",
           headers: {
@@ -43,13 +47,15 @@ export default function TaskBody() {
           throw new Error(`Response ${response.status}`);
         }
         const addedTask = await response.json();
+        console.log("Added task sent from backend:");
         console.log(addedTask);
+
+        //Adds the tasks to the array
+        setTasks([...tasks, addedTask]);
       } catch (error) {
         console.error(error.message);
       }
 
-      // Takes the current items already in tasks and add the new task - newTaskObj
-      setTasks([...tasks, newTaskObj]);
       setNewTask("");
     }
   };
@@ -63,22 +69,40 @@ export default function TaskBody() {
     try {
       const response = await fetch(deleteTaskUrl, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: id }),
       });
 
       if (!response.ok) {
         throw new Error(`Response ${response.status}`);
       }
       const deletedTask = await response.json();
-      console.log(deletedTask);
+      console.log("Deleted task:");
+      console.log(deletedTask.id);
+
+      //Removes any item that matches false and re-renders array
+      const filteredArray = tasks.filter((task, _) => {
+        return task.id !== deletedTask.id;
+      });
+      setTasks(filteredArray);
     } catch (error) {
       console.error(error.message);
     }
+  };
 
-    //Removes any item that matches false and re-renders array
-    const filteredArray = tasks.filter((task, _) => {
-      return task.id !== id;
-    });
-    setTasks(filteredArray);
+  const handleEdit = async (id: number, text: string) => {
+    setTasks(
+      //Cant use task.text[id] because react expects a new object not direct changes
+      tasks.map((task) => {
+        if (task.id === id) {
+          //Keep the same object contents and change text
+          return { ...task, text: text }; //Changes the specific content
+        }
+        return task; //Returns rest of the contents
+      }),
+    );
   };
 
   //Function to get tasks for useEffect
@@ -118,12 +142,23 @@ export default function TaskBody() {
       <div className="m-[1rem] h-full w-80 overflow-y-auto rounded-2xl border-2 border-black">
         {tasks.map((task, _) => {
           return (
+            //Used this once testing is done
             <Message
               key={task.id}
               text={task.text}
               id={task.id}
               onDelete={handleDelete}
+              onEdit={handleEdit}
             ></Message>
+
+            //This component is being used to test
+            // <Message2
+            //   key={task.id}
+            //   text={task.text}
+            //   id={task.id}
+            //   onDelete={handleDelete}
+            //   onEdit={handleEdit}
+            // ></Message2>
           );
         })}
       </div>

@@ -11,3 +11,7 @@ npx tsc --init for tsconfig.json
 Project for Learning:
 Task Tracker App
 
+Next Steps:
+Send task to backend then return back to frontend to get proper id.
+Work on delete request after
+
